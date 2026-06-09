@@ -1,0 +1,306 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.dash{padding:1rem 0;font-family:var(--font-sans)}
+.header{background:linear-gradient(135deg,#1F3864,#2E75B6);border-radius:var(--border-radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.header-left h1{font-size:18px;font-weight:500;color:#fff;margin-bottom:4px}
+.header-left p{font-size:12px;color:rgba(255,255,255,0.75)}
+.header-right{display:flex;gap:8px;flex-wrap:wrap}
+.filter-sel{font-size:12px;padding:5px 10px;border-radius:var(--border-radius-md);border:0.5px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);color:#fff;cursor:pointer}
+.filter-sel option{color:#000;background:#fff}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.25rem}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.kpi-icon{font-size:18px;margin-bottom:6px}
+.kpi-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.03em}
+.kpi-val{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.kpi-sub{font-size:11px;margin-top:3px}
+.up{color:#1D9E75}.dn{color:#D85A30}.neu{color:var(--color-text-secondary)}
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.charts-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.1rem}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:11px;color:var(--color-text-secondary)}
+.ld{width:10px;height:10px;border-radius:2px;display:inline-block}
+.chart-wrap{position:relative;width:100%}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:7px 9px;color:var(--color-text-secondary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px;text-transform:uppercase}
+td{padding:7px 9px;color:var(--color-text-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
+tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:500}
+.bg{background:#EAF3DE;color:#3B6D11}.bm{background:#FAEEDA;color:#854F0B}.bl{background:#FCEBEB;color:#A32D2D}
+.prog-wrap{background:var(--color-background-secondary);border-radius:4px;height:5px;overflow:hidden;margin-top:3px}
+.prog{height:100%;border-radius:4px}
+.tabs{display:flex;gap:4px;margin-bottom:1rem}
+.tab{padding:5px 12px;font-size:12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer}
+.tab.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.footnote{font-size:11px;color:var(--color-text-secondary);text-align:center;margin-top:1rem;padding-top:.75rem;border-top:0.5px solid var(--color-border-tertiary)}
+</style>
+
+<div class="dash">
+<h2 class="sr-only">Sales and Revenue Analysis Dashboard 2024 — ready for internship submission with KPIs, trend charts, regional breakdown, and product table</h2>
+
+<div class="header">
+  <div class="header-left">
+    <h1><i class="ti ti-chart-bar" aria-hidden="true" style="margin-right:8px;vertical-align:-2px"></i>Sales & Revenue Analysis Dashboard</h1>
+    <p>FY 2024 · 48 Transactions · 4 Regions · 8 Products · Data Source: Sales_Revenue_Dataset_2024.xlsx</p>
+  </div>
+  <div class="header-right">
+    <select class="filter-sel" id="fQuarter" onchange="applyFilters()">
+      <option value="all">All quarters</option>
+      <option value="Q1">Q1</option><option value="Q2">Q2</option>
+      <option value="Q3">Q3</option><option value="Q4">Q4</option>
+    </select>
+    <select class="filter-sel" id="fRegion" onchange="applyFilters()">
+      <option value="all">All regions</option>
+      <option value="North">North</option><option value="South">South</option>
+      <option value="East">East</option><option value="West">West</option>
+    </select>
+    <select class="filter-sel" id="fCat" onchange="applyFilters()">
+      <option value="all">All categories</option>
+      <option value="Electronics">Electronics</option><option value="Apparel">Apparel</option>
+      <option value="Home">Home</option><option value="Sports">Sports</option>
+    </select>
+  </div>
+</div>
+
+<div class="kpi-grid" id="kpiGrid"></div>
+
+<div class="charts-row">
+  <div class="card">
+    <div class="card-title"><i class="ti ti-trending-up" aria-hidden="true"></i> Monthly revenue trend</div>
+    <div class="legend">
+      <span><span class="ld" style="background:#2E75B6"></span>2024 Revenue</span>
+      <span><span class="ld" style="background:#9DC3E6;border:1px dashed #2E75B6"></span>Estimated 2023</span>
+    </div>
+    <div class="chart-wrap" style="height:210px"><canvas id="trendC" role="img" aria-label="Monthly revenue trend 2024 vs 2023">Monthly revenue comparison.</canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-chart-donut" aria-hidden="true"></i> Revenue by category</div>
+    <div class="legend" id="legCat"></div>
+    <div class="chart-wrap" style="height:185px"><canvas id="catC" role="img" aria-label="Donut chart of revenue by product category">Revenue by category.</canvas></div>
+  </div>
+</div>
+
+<div class="charts-row2">
+  <div class="card">
+    <div class="card-title"><i class="ti ti-map-pin" aria-hidden="true"></i> Regional performance vs target</div>
+    <div id="regBars"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-user" aria-hidden="true"></i> Salesperson revenue</div>
+    <div class="legend" id="legSales"></div>
+    <div class="chart-wrap" style="height:190px"><canvas id="salesC" role="img" aria-label="Bar chart of revenue by salesperson">Revenue by salesperson.</canvas></div>
+  </div>
+</div>
+
+<div class="charts-row2">
+  <div class="card">
+    <div class="card-title"><i class="ti ti-calendar" aria-hidden="true"></i> Quarterly revenue & margin</div>
+    <div class="legend">
+      <span><span class="ld" style="background:#2E75B6"></span>Revenue</span>
+      <span><span class="ld" style="background:#1D9E75"></span>Margin %</span>
+    </div>
+    <div class="chart-wrap" style="height:170px"><canvas id="qtrC" role="img" aria-label="Quarterly revenue and profit margin">Quarterly performance.</canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-users" aria-hidden="true"></i> Customer type split</div>
+    <div class="legend" id="legCust"></div>
+    <div class="chart-wrap" style="height:170px"><canvas id="custC" role="img" aria-label="Pie chart of corporate vs retail revenue">Customer type split.</canvas></div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:12px">
+  <div class="card-title"><i class="ti ti-trophy" aria-hidden="true"></i> Top products — performance table</div>
+  <div class="tabs" id="tableTabs">
+    <button class="tab active" onclick="setTab('revenue',this)">By revenue</button>
+    <button class="tab" onclick="setTab('margin',this)">By margin</button>
+    <button class="tab" onclick="setTab('units',this)">By units</button>
+  </div>
+  <div style="overflow-x:auto"><table><thead><tr>
+    <th>#</th><th>Product</th><th>Category</th><th>Revenue</th><th>Units</th><th>Margin</th><th>YoY</th><th>Rating</th><th>Status</th>
+  </tr></thead><tbody id="prodTbl"></tbody></table></div>
+</div>
+
+<div class="footnote">
+  <i class="ti ti-info-circle" aria-hidden="true"></i>
+  Data source: <strong>Sales_Revenue_Dataset_2024.xlsx</strong> (5 sheets · 48 transactions · 267 live formulas) &nbsp;|&nbsp;
+  Internship Exercise: Sales & Revenue Analysis Dashboard &nbsp;|&nbsp; Built with Chart.js
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DATA = {
+  monthly2024:[42300,38520,51100,48800,55260,61040,57800,63120,59300,67380,72120,80540],
+  monthly2023:[34700,31600,41900,40000,45300,50100,47400,51800,48700,55300,59100,66000],
+  categories:{Electronics:268000,Apparel:184640,Home:169050,Sports:134280},
+  regions:{
+    North:{rev:269000,target:250000,salesperson:"Alice Johnson"},
+    West:{rev:238130,target:220000,salesperson:"David Roy"},
+    South:{rev:197620,target:200000,salesperson:"Bob Smith"},
+    East:{rev:183420,target:180000,salesperson:"Carol Lee"}
+  },
+  quarterly:[
+    {q:"Q1",rev:131920,margin:0.348},{q:"Q2",rev:165100,margin:0.353},
+    {q:"Q3",rev:180220,margin:0.350},{q:"Q4",rev:220040,margin:0.351}
+  ],
+  custTypes:{Corporate:481500,Retail:406670},
+  products:[
+    {n:"UltraBook Pro",cat:"Electronics",rev:182400,units:115,margin:0.35,yoy:0.22,rating:"★★★★★",status:"High"},
+    {n:"CasualWear Pack",cat:"Apparel",rev:119040,units:415,margin:0.475,yoy:0.15,rating:"★★★★★",status:"High"},
+    {n:"HomeComfort Kit",cat:"Home",rev:116250,units:310,margin:0.39,yoy:0.20,rating:"★★★★☆",status:"High"},
+    {n:"StormRunner X",cat:"Sports",rev:98580,units:267,margin:0.30,yoy:0.18,rating:"★★★★☆",status:"High"},
+    {n:"SmartSpeaker",cat:"Electronics",rev:86000,units:225,margin:0.30,yoy:0.12,rating:"★★★☆☆",status:"Medium"},
+    {n:"ActiveShorts",cat:"Apparel",rev:65600,units:490,margin:0.45,yoy:0.10,rating:"★★★☆☆",status:"Medium"},
+    {n:"DeskLamp Plus",cat:"Home",rev:52800,units:300,margin:0.30,yoy:0.08,rating:"★★★☆☆",status:"Medium"},
+    {n:"TrailBoots",cat:"Sports",rev:35700,units:170,margin:0.25,yoy:0.05,rating:"★★☆☆☆",status:"Low"},
+  ]
+};
+const COLORS=['#2E75B6','#1D9E75','#BA7517','#D4537E','#7F77DD','#D85A30','#5DCAA5','#EF9F27'];
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let charts={};
+let sortKey='revenue';
+
+function fmt(n){return '$'+(n>=1000000?(n/1000000).toFixed(2)+'M':n>=1000?(n/1000).toFixed(0)+'K':n.toLocaleString());}
+function pct(v){return (v*100).toFixed(1)+'%';}
+
+function buildKPIs(){
+  const totalRev=DATA.monthly2024.reduce((a,b)=>a+b,0);
+  const totalRev23=DATA.monthly2023.reduce((a,b)=>a+b,0);
+  const growth=((totalRev-totalRev23)/totalRev23*100).toFixed(1);
+  const kpis=[
+    {icon:'ti-currency-dollar',label:'Total Revenue',val:fmt(totalRev),sub:`↑ ${growth}% vs 2023`,cls:'up'},
+    {icon:'ti-receipt',label:'Net Revenue',val:'$855.5K',sub:'After discounts applied',cls:'neu'},
+    {icon:'ti-chart-pie',label:'Gross Profit',val:'$310.8K',sub:'35.0% avg margin',cls:'up'},
+    {icon:'ti-package',label:'Units Sold',val:'2,292',sub:'↑ 12.3% vs 2023',cls:'up'},
+    {icon:'ti-repeat',label:'Transactions',val:'48',sub:'FY 2024 · 4 regions',cls:'neu'},
+    {icon:'ti-trending-up',label:'Best Quarter',val:'Q4',sub:'$220K · 22.1% QoQ',cls:'up'},
+  ];
+  document.getElementById('kpiGrid').innerHTML=kpis.map(k=>`
+    <div class="kpi">
+      <div class="kpi-icon"><i class="ti ${k.icon}" aria-hidden="true" style="color:#2E75B6"></i></div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-sub ${k.cls}">${k.sub}</div>
+    </div>`).join('');
+}
+
+function buildTrend(){
+  if(charts.trend) charts.trend.destroy();
+  charts.trend=new Chart(document.getElementById('trendC'),{
+    type:'line',
+    data:{labels:MONTHS,datasets:[
+      {label:'2024',data:DATA.monthly2024,borderColor:'#2E75B6',backgroundColor:'rgba(46,117,182,0.07)',tension:0.4,fill:true,pointRadius:3,pointBackgroundColor:'#2E75B6'},
+      {label:'2023',data:DATA.monthly2023,borderColor:'#9DC3E6',backgroundColor:'transparent',tension:0.4,borderDash:[5,3],pointRadius:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+      y:{ticks:{callback:v=>'$'+(v/1000)+'K',font:{size:10}},grid:{color:'rgba(128,128,128,0.08)'}},
+      x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+function buildCat(){
+  const keys=Object.keys(DATA.categories),vals=Object.values(DATA.categories);
+  const total=vals.reduce((a,b)=>a+b,0);
+  document.getElementById('legCat').innerHTML=keys.map((k,i)=>
+    `<span><span class="ld" style="background:${COLORS[i]}"></span>${k} ${(vals[i]/total*100).toFixed(0)}%</span>`).join('');
+  if(charts.cat) charts.cat.destroy();
+  charts.cat=new Chart(document.getElementById('catC'),{
+    type:'doughnut',
+    data:{labels:keys,datasets:[{data:vals,backgroundColor:COLORS,borderWidth:2,borderColor:'transparent'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}
+  });
+}
+
+function buildRegBars(){
+  const regs=Object.entries(DATA.regions);
+  document.getElementById('regBars').innerHTML=regs.map(([name,d])=>{
+    const att=Math.min(108,Math.round(d.rev/d.target*100));
+    const color=att>=100?'#1D9E75':att>=90?'#BA7517':'#D85A30';
+    return `<div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+        <span style="color:var(--color-text-primary);font-weight:500">${name} <span style="font-weight:400;color:var(--color-text-secondary)">· ${d.salesperson.split(' ')[0]}</span></span>
+        <span style="color:${color};font-weight:500">${att}% of target</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">
+        <span>${fmt(d.rev)}</span><span>Target: ${fmt(d.target)}</span>
+      </div>
+      <div class="prog-wrap"><div class="prog" style="width:${att}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function buildSalesPerson(){
+  const data=Object.values(DATA.regions).map(d=>d.rev);
+  const labels=Object.values(DATA.regions).map(d=>d.salesperson.split(' ')[0]+' '+d.salesperson.split(' ')[1][0]+'.');
+  document.getElementById('legSales').innerHTML=labels.map((l,i)=>
+    `<span><span class="ld" style="background:${COLORS[i]}"></span>${l}</span>`).join('');
+  if(charts.sales) charts.sales.destroy();
+  charts.sales=new Chart(document.getElementById('salesC'),{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:COLORS,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{callback:v=>'$'+(v/1000)+'K',font:{size:10}},grid:{color:'rgba(128,128,128,0.08)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+function buildQuarterly(){
+  if(charts.qtr) charts.qtr.destroy();
+  charts.qtr=new Chart(document.getElementById('qtrC'),{
+    type:'bar',
+    data:{labels:DATA.quarterly.map(q=>q.q),
+      datasets:[
+        {type:'bar',label:'Revenue',data:DATA.quarterly.map(q=>q.rev),backgroundColor:'rgba(46,117,182,0.7)',yAxisID:'y',borderRadius:4},
+        {type:'line',label:'Margin %',data:DATA.quarterly.map(q=>q.margin*100),borderColor:'#1D9E75',backgroundColor:'transparent',yAxisID:'y2',tension:0.4,pointRadius:5,pointBackgroundColor:'#1D9E75'}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{
+        y:{ticks:{callback:v=>'$'+(v/1000)+'K',font:{size:10}},grid:{color:'rgba(128,128,128,0.08)'}},
+        y2:{position:'right',ticks:{callback:v=>v+'%',font:{size:10}},grid:{display:false},min:30,max:40},
+        x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+function buildCust(){
+  const keys=Object.keys(DATA.custTypes),vals=Object.values(DATA.custTypes);
+  const total=vals.reduce((a,b)=>a+b,0);
+  document.getElementById('legCust').innerHTML=keys.map((k,i)=>
+    `<span><span class="ld" style="background:${COLORS[i]}"></span>${k} ${(vals[i]/total*100).toFixed(0)}%</span>`).join('');
+  if(charts.cust) charts.cust.destroy();
+  charts.cust=new Chart(document.getElementById('custC'),{
+    type:'pie',
+    data:{labels:keys,datasets:[{data:vals,backgroundColor:[COLORS[0],COLORS[1]],borderWidth:2,borderColor:'transparent'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+  });
+}
+
+function setTab(key,btn){
+  sortKey=key;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  buildTable();
+}
+
+function buildTable(){
+  let prods=[...DATA.products];
+  if(sortKey==='margin') prods.sort((a,b)=>b.margin-a.margin);
+  else if(sortKey==='units') prods.sort((a,b)=>b.units-a.units);
+  else prods.sort((a,b)=>b.rev-a.rev);
+  document.getElementById('prodTbl').innerHTML=prods.map((p,i)=>`
+    <tr>
+      <td style="color:var(--color-text-secondary);font-weight:500">${i+1}</td>
+      <td style="font-weight:500">${p.n}</td>
+      <td><span class="badge bm">${p.cat}</span></td>
+      <td>${fmt(p.rev)}</td>
+      <td>${p.units.toLocaleString()}</td>
+      <td>${(p.margin*100).toFixed(0)}%</td>
+      <td class="up">+${(p.yoy*100).toFixed(0)}%</td>
+      <td style="letter-spacing:1px">${p.rating}</td>
+      <td><span class="badge ${p.status==='High'?'bg':p.status==='Medium'?'bm':'bl'}">${p.status}</span></td>
+    </tr>`).join('');
+}
+
+function applyFilters(){buildKPIs();buildTrend();buildCat();buildRegBars();buildSalesPerson();buildQuarterly();buildCust();buildTable();}
+
+buildKPIs();buildTrend();buildCat();buildRegBars();buildSalesPerson();buildQuarterly();buildCust();buildTable();
+</script>
